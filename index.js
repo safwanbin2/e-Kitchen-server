@@ -24,6 +24,7 @@ async function run() {
 run();
 
 const ServiceCollection = client.db('eKitchen').collection('services');
+const ReviewCollection = client.db('eKitchen').collection('reviews');
 
 app.get('/', (req, res) => {
     res.send('eKitchen server is running fine');
@@ -53,7 +54,29 @@ app.get('/services/:id', async (req, res) => {
     }
 })
 
+app.post('/reviews', async (req, res) => {
+    try {
+        const newReview = req.body;
+        const data = await ReviewCollection.insertOne(newReview);
 
+        res.send(data);
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+app.get('/reviews/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const query = { serviceId: id }
+        const cursor = ReviewCollection.find(query);
+        const data = await cursor.toArray();
+
+        res.send(data);
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 
 
