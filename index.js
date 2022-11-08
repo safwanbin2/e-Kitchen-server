@@ -30,6 +30,17 @@ app.get('/', (req, res) => {
     res.send('eKitchen server is running fine');
 })
 
+app.post('/services', async (req, res) => {
+    try {
+        const newService = req.body;
+        const data = await ServiceCollection.insertOne(newService);
+
+        res.send(data);
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 app.get('/services', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit);
