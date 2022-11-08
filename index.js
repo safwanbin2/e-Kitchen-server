@@ -65,6 +65,23 @@ app.post('/reviews', async (req, res) => {
     }
 })
 
+app.get('/reviews', async (req, res) => {
+    try {
+        let query = {};
+        if (req.query.email) {
+            query = {
+                email: req.query.email
+            }
+        }
+        const cursor = ReviewCollection.find(query);
+        const data = await cursor.toArray();
+
+        res.send(data);
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 app.get('/reviews/:id', async (req, res) => {
     try {
         const id = req.params.id;
@@ -78,6 +95,17 @@ app.get('/reviews/:id', async (req, res) => {
     }
 })
 
+app.delete('/reviews/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const data = await ReviewCollection.deleteOne(query);
+
+        res.send(data);
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 
 
