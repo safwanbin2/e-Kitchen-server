@@ -18,6 +18,21 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 // mongo db client
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+// verifying jwt token send with headers
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        res.status(401).send('unauthorized access')
+    }
+    const token = authHeader.split(' ')[1]
+    jwt.verify(token, process.env.JWT_ACCESS_TOKEN, (err, decoded) => {
+        if (err) {
+            res.status(401).send('unauthorized access')
+        }
+        req.decoded = decoded;
+        next();
+    })
+}
 // root function to connect client to mongo db
 async function run() {
     try {
@@ -38,6 +53,17 @@ app.get('/', (req, res) => {
     res.send('eKitchen server is running fine');
 })
 
+// assgingn jwt token
+app.post('/jwt', async (req, res) => {
+    try {
+        const email = req.body;
+        const token = await jwt.sign(email, process.env.JWT_ACCESS_TOKEN);
+
+        res.send({ token });
+    } catch (error) {
+        console.log(error)
+    }
+})
 // BASIC crud operations
 app.post('/services', async (req, res) => {
     try {
@@ -85,8 +111,12 @@ app.post('/reviews', async (req, res) => {
     }
 })
 
-app.get('/reviews', async (req, res) => {
+app.get('/reviews', verifyJWT, async (req, res) => {
     try {
+        const decoded = req.decoded;
+        if (decoded.email !== req.query.email) {
+            res.status(403).send('unauthorized access')
+        }
         let query = {};
         if (req.query.email) {
             query = {
