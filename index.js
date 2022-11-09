@@ -96,7 +96,7 @@ app.get('/reviews', async (req, res) => {
         const cursor = ReviewCollection.find(query);
         const data = await cursor.toArray();
 
-        res.send(data);
+        res.send(data.reverse());
     } catch (error) {
         console.log(error)
     }
@@ -109,7 +109,7 @@ app.get('/reviews/:id', async (req, res) => {
         const cursor = ReviewCollection.find(query);
         const data = await cursor.toArray();
 
-        res.send(data);
+        res.send(data.reverse());
     } catch (error) {
         console.log(error)
     }
