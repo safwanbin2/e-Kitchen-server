@@ -127,6 +127,19 @@ app.delete('/reviews/:id', async (req, res) => {
     }
 })
 
+app.patch('/reviews/:id', async (req, res) => {
+    try {
+        const updateBody = req.body;
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) }
+
+        const data = await ReviewCollection.updateOne(query, { $set: updateBody })
+
+        res.send(data)
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 
 
